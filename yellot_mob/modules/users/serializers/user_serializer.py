@@ -3,6 +3,7 @@ from rest_framework import serializers
 
 from django.contrib.auth.models import User
 
+
 class UserSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(required=True)
     first_name = serializers.CharField(required=True)
@@ -11,7 +12,15 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ["id", "username", "email", "first_name", "last_name", "password", "password_confirm"]
+        fields = [
+            "id",
+            "username",
+            "email",
+            "first_name",
+            "last_name",
+            "password",
+            "password_confirm",
+        ]
         extra_kwargs = {"password": {"write_only": True}}
 
     def validate_username(self, username):
@@ -26,20 +35,26 @@ class UserSerializer(serializers.ModelSerializer):
 
     def validate_first_name(self, first_name):
         if len(first_name) < 3:
-            raise serializers.ValidationError("First name must be at least 3 characters long.")
+            raise serializers.ValidationError(
+                "First name must be at least 3 characters long."
+            )
 
         return first_name
 
     def validate_last_name(self, last_name):
         if len(last_name) < 5:
-            raise serializers.ValidationError("Last name must be at least 5 characters long.")
+            raise serializers.ValidationError(
+                "Last name must be at least 5 characters long."
+            )
 
         return last_name
 
     def validate_password(self, password):
-        pattern = r'^(?=.*[a-z])(?=.*[A-Z])(?=.*[\W_]).+$'
+        pattern = r"^(?=.*[a-z])(?=.*[A-Z])(?=.*[\W_]).+$"
         if len(password) < 8:
-            raise serializers.ValidationError("Password must be at least 8 characters long.")
+            raise serializers.ValidationError(
+                "Password must be at least 8 characters long."
+            )
 
         if not bool(re.match(pattern, password)):
             raise serializers.ValidationError(

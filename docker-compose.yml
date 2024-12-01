@@ -17,7 +17,20 @@ services:
       timeout: 5s
       retries: 5
     networks:
-        - yellot
+      - yellot
+
+  redis:
+    image: redis:alpine
+    container_name: redis
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    networks:
+      - yellot
 
   app:
     <<: *default-build
@@ -29,9 +42,57 @@ services:
     depends_on:
       db:
         condition: service_healthy
+      redis:
+        condition: service_healthy
     networks:
       - yellot
     command: [ "./scripts/start.sh" ]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:${DJANGO_BIND_PORT}/health/"]
+      interval: 30s
+      retries: 3
+      timeout: 10s
+
+  websocket:
+    <<: *default-build
+    command: ["daphne", "-b", "0.0.0.0", "-p", "${DAPHNE_PORT}", "yellot_mob.asgi:application"]
+    environment:
+      - DJANGO_SETTINGS_MODULE=yellot_mob.settings
+      - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
+      - DB_ENGINE=${DB_ENGINE}
+      - DB_DATABASE=${DB_DATABASE}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
+    volumes:
+      - .:/app
+    depends_on:
+      app:
+        condition: service_started
+      redis:
+        condition: service_healthy
+    networks:
+      - yellot
+    ports:
+      - "${DAPHNE_PORT}:${DAPHNE_PORT}"
+
+  test:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - DJANGO_SETTINGS_MODULE=yellot_mob.settings
+      - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
+      - DJANGO_SESSION_COOKIE_NAME=${DJANGO_SESSION_COOKIE_NAME}
+      - DJANGO_CSRF_COOKIE_NAME=${DJANGO_CSRF_COOKIE_NAME}
+      - DJANGO_TESTING=true
+    command: [ "pytest" ]
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - yellot
 
 networks:
-    yellot:
+  yellot:

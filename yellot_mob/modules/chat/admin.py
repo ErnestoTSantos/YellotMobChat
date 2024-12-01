@@ -13,4 +13,7 @@ class ChatRoomAdmin(admin.ModelAdmin):
 @admin.register(ChatMessage)
 class ChatMessageAdmin(admin.ModelAdmin):
     list_display = ("id", "user", "room", "created_at", "updated_at")
-    list_filter = ("user", "room__name",)
+    list_filter = (
+        "user",
+        "room__name",
+    )
