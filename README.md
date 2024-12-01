@@ -24,6 +24,14 @@
 - Testes automatizados
 - Documentação de API
 
+## Payload para comunicar no websocket:
+```json
+{
+    "message": "Hello World",
+    "user": "username"
+}
+```
+
 ---
 
 ## Explicação das decisões de desenvolvimento
