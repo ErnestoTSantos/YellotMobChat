@@ -29,10 +29,10 @@
 1. Abra o insominia ou postman.
 2. Tenha um usuário cadastrado na aplicação.
 3. Crie uma nova requisição do tipo `WebSocket Request`.
-![Insomnia WebSocket](./documentation_images/websocket_request.png)
+   - ![Insomnia WebSocket](./documentation_images/websocket_request.png)
 4. Preencha o campo `URL` com `ws://localhost:<Porta adicionada na variável DAPHNE_PORT>/ws/chat/<NomeDaSala>/`.
 5. Adicione aos headers o campo `Authorization` com o valor `Bearer <token>`, certifique-se que o token está valido.
-![Insomnia WebSocket Header](./documentation_images/headers.png)
+   - ![Insomnia WebSocket Header](./documentation_images/headers.png)
 6. Clique em `Connect`.
 
 ## Payload para comunicar no websocket:
